@@ -1,0 +1,386 @@
+Programmable Current Load
+http://paulorenato.com/index.php/about?id=91
+http://www.instructables.com/id/Arduino-Programmable-Constant-Current-Power-Resist/
+http://hackaday.com/2014/02/24/an-arduino-programmable-load/
+http://www.kerrywong.com/2013/10/24/building-a-constant-currentconstant-power-electronic-load/
+
+
+Using Teensy 3.1 and Marlin firwware to control 3D printer
+http://arduino-pi.blogspot.com/2015/04/repetier-successfully-connected-and.html
+
+
+FreeRTOS on RPi:
+http://www.eecs.umich.edu/courses/eecs473/labs.html
+
+
+KVM on RPi2
+http://blog.flexvdi.com/2015/03/17/enabling-kvm-virtualization-on-the-raspberry-pi-2/
+
+
+USB Driver for teensy 3.1:
+http://kevincuzner.com/2014/12/12/teensy-3-1-bare-metal-writing-a-usb-driver/
+
+
+STM32F4 CMSIS library
+http://www.emcu.it/STM32F4xx/STM32F4-Library/STM32F4-Library.html
+
+
+Setting up gcc for arm stm32f4
+http://jeremyherbert.net/get/stm32f4_getting_started
+http://www.wolinlabs.com/blog/linux.stm32.discovery.gcc.html
+https://istarc.wordpress.com/2014/07/21/stm32f4-build-your-toolchain-from-scratch/
+http://blog.mark-stevens.co.uk/category/software-development/
+
+
+GCC inline assembly constraints for ARM / Teensy 3.1
+http://stackoverflow.com/questions/29243231/arm-cortex-m4-teensy-3-1-inline-assembly-constraints
+
+
+GCC arm for teensy 3.1
+http://www.seanet.com/~karllunt/bareteensy31.html
+http://kevincuzner.com/2014/04/28/teensy-3-1-bare-metal/
+https://www.reddit.com/r/Teensy/comments/31dz5k/teensy_31_compile_from_the_command_line/
+
+
+python tutorial
+https://docs.python.org/2/tutorial/
+
+
+digital filter:
+http://www.mikroe.com/chapters/view/73/chapter-3-iir-filters/
+http://aosabook.org/en/500L/a-pedometer-in-the-real-world.html
+https://www.raspberrypi.org/forums/viewtopic.php?f=44&t=7509
+http://cs.smith.edu/dftwiki/index.php/Tutorial:_Interrupt-Driven_Event-Counter_on_the_Raspberry_Pi
+http://blogsmayan.blogspot.com/p/programming-interrupts-in-raspberry-pi.html
+http://www.eas.uccs.edu/wickert/ece2610/lecture_notes/
+
+
+LVM links:
+http://blog.ataboydesign.com/2012/08/29/installing-arch-linux-on-lvm/
+http://wiki.tldp.org/LVM-on-RAID
+
+
+TCL tutorial
+http://www.wellho.net/forum/The-Tcl-programming-language/how-to-store-data-in-array.html
+http://docs.activestate.com/activetcl/8.5/tcltutorial/Tcl23a.html
+
+
+Accelerometer, Gyroscope and IMU Sensors - Tutorials
+http://www.intorobotics.com/accelerometer-gyroscope-and-imu-sensors-tutorials/
+
+
+Linux Screen Tutorial
+http://www.computerhope.com/unix/screen.htm
+
+
+DMOZ circuits Database
+http://www.dmoz.org/Science/Technology/Electronics/Reference/Circuit_Archives/
+
+
+I/Q Data for Dummies
+http://whiteboard.ping.se/SDR/IQ
+https://forum.allaboutcircuits.com/threads/understanding-iq-modulation-as-used-in-software-defined-radio.107684/
+
+
+google: tayloe mixer ltspice
+http://www.fourier-series.com/IQMod/index.html
+http://ea4nz.ure.es/sdr/sdr.html
+http://www.waves.utoronto.ca/prof/svhum/ece422/sdr/qsd.html
+https://github.com/dcwbrown/dwire-debug
+
+
+Getting Started with GNU Radio and RTL-SDR
+http://blog.opensecurityresearch.com/2012/06/getting-started-with-gnu-radio-and-rtl.html
+
+
+Building a Custom Mainline Linux Kernel System on the Orange Pi PC
+https://notsyncing.net/?p=blog&b=2016.orangepi-pc-custom-kernel
+
+
+
+
+
+/* Copyright (c) 2011, RidgeRun
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *    This product includes software developed by the RidgeRun.
+ * 4. Neither the name of the RidgeRun nor the
+ *    names of its contributors may be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY RIDGERUN ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL RIDGERUN BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <poll.h>
+
+ /****************************************************************
+ * Constants
+ ****************************************************************/
+ 
+#define SYSFS_GPIO_DIR "/sys/class/gpio"
+#define POLL_TIMEOUT (3 * 1000) /* 3 seconds */
+#define MAX_BUF 64
+
+/****************************************************************
+ * gpio_export
+ ****************************************************************/
+int gpio_export(unsigned int gpio)
+{
+	int fd, len;
+	char buf[MAX_BUF];
+ 
+	fd = open(SYSFS_GPIO_DIR "/export", O_WRONLY);
+	if (fd < 0) {
+		perror("gpio/export");
+		return fd;
+	}
+ 
+	len = snprintf(buf, sizeof(buf), "%d", gpio);
+	write(fd, buf, len);
+	close(fd);
+ 
+	return 0;
+}
+
+/****************************************************************
+ * gpio_unexport
+ ****************************************************************/
+int gpio_unexport(unsigned int gpio)
+{
+	int fd, len;
+	char buf[MAX_BUF];
+ 
+	fd = open(SYSFS_GPIO_DIR "/unexport", O_WRONLY);
+	if (fd < 0) {
+		perror("gpio/export");
+		return fd;
+	}
+ 
+	len = snprintf(buf, sizeof(buf), "%d", gpio);
+	write(fd, buf, len);
+	close(fd);
+	return 0;
+}
+
+/****************************************************************
+ * gpio_set_dir
+ ****************************************************************/
+int gpio_set_dir(unsigned int gpio, unsigned int out_flag)
+{
+	int fd, len;
+	char buf[MAX_BUF];
+ 
+	len = snprintf(buf, sizeof(buf), SYSFS_GPIO_DIR  "/gpio%d/direction", gpio);
+ 
+	fd = open(buf, O_WRONLY);
+	if (fd < 0) {
+		perror("gpio/direction");
+		return fd;
+	}
+ 
+	if (out_flag)
+		write(fd, "out", 4);
+	else
+		write(fd, "in", 3);
+ 
+	close(fd);
+	return 0;
+}
+
+/****************************************************************
+ * gpio_set_value
+ ****************************************************************/
+int gpio_set_value(unsigned int gpio, unsigned int value)
+{
+	int fd, len;
+	char buf[MAX_BUF];
+ 
+	len = snprintf(buf, sizeof(buf), SYSFS_GPIO_DIR "/gpio%d/value", gpio);
+ 
+	fd = open(buf, O_WRONLY);
+	if (fd < 0) {
+		perror("gpio/set-value");
+		return fd;
+	}
+ 
+	if (value)
+		write(fd, "1", 2);
+	else
+		write(fd, "0", 2);
+ 
+	close(fd);
+	return 0;
+}
+
+/****************************************************************
+ * gpio_get_value
+ ****************************************************************/
+int gpio_get_value(unsigned int gpio, unsigned int *value)
+{
+	int fd, len;
+	char buf[MAX_BUF];
+	char ch;
+
+	len = snprintf(buf, sizeof(buf), SYSFS_GPIO_DIR "/gpio%d/value", gpio);
+ 
+	fd = open(buf, O_RDONLY);
+	if (fd < 0) {
+		perror("gpio/get-value");
+		return fd;
+	}
+ 
+	read(fd, &ch, 1);
+
+	if (ch != '0') {
+		*value = 1;
+	} else {
+		*value = 0;
+	}
+ 
+	close(fd);
+	return 0;
+}
+
+
+/****************************************************************
+ * gpio_set_edge
+ ****************************************************************/
+
+int gpio_set_edge(unsigned int gpio, char *edge)
+{
+	int fd, len;
+	char buf[MAX_BUF];
+
+	len = snprintf(buf, sizeof(buf), SYSFS_GPIO_DIR "/gpio%d/edge", gpio);
+ 
+	fd = open(buf, O_WRONLY);
+	if (fd < 0) {
+		perror("gpio/set-edge");
+		return fd;
+	}
+ 
+	write(fd, edge, strlen(edge) + 1); 
+	close(fd);
+	return 0;
+}
+
+/****************************************************************
+ * gpio_fd_open
+ ****************************************************************/
+
+int gpio_fd_open(unsigned int gpio)
+{
+	int fd, len;
+	char buf[MAX_BUF];
+
+	len = snprintf(buf, sizeof(buf), SYSFS_GPIO_DIR "/gpio%d/value", gpio);
+ 
+	fd = open(buf, O_RDONLY | O_NONBLOCK );
+	if (fd < 0) {
+		perror("gpio/fd_open");
+	}
+	return fd;
+}
+
+/****************************************************************
+ * gpio_fd_close
+ ****************************************************************/
+
+int gpio_fd_close(int fd)
+{
+	return close(fd);
+}
+
+/****************************************************************
+ * Main
+ ****************************************************************/
+int main(int argc, char **argv, char **envp)
+{
+	struct pollfd fdset[2];
+	int nfds = 2;
+	int gpio_fd, timeout, rc;
+	char *buf[MAX_BUF];
+	unsigned int gpio;
+	int len;
+
+
+
+	if (argc < 2) {
+		printf("Usage: gpio-int <gpio-pin>\n\n");
+		printf("Waits for a change in the GPIO pin voltage level or input on stdin\n");
+		exit(-1);
+	}
+
+	gpio = atoi(argv[1]);
+
+	gpio_export(gpio);
+	gpio_set_dir(gpio, 0);
+	gpio_set_edge(gpio, "rising");
+	gpio_fd = gpio_fd_open(gpio);
+
+	timeout = POLL_TIMEOUT;
+ 
+	while (1) {
+		memset((void*)fdset, 0, sizeof(fdset));
+
+		fdset[0].fd = STDIN_FILENO;
+		fdset[0].events = POLLIN;
+      
+		fdset[1].fd = gpio_fd;
+		fdset[1].events = POLLPRI;
+
+		rc = poll(fdset, nfds, timeout);      
+
+		if (rc < 0) {
+			printf("\npoll() failed!\n");
+			return -1;
+		}
+      
+		if (rc == 0) {
+			printf(".");
+		}
+            
+		if (fdset[1].revents & POLLPRI) {
+			len = read(fdset[1].fd, buf, MAX_BUF);
+			printf("\npoll() GPIO %d interrupt occurred\n", gpio);
+		}
+
+		if (fdset[0].revents & POLLIN) {
+			(void)read(fdset[0].fd, buf, 1);
+			printf("\npoll() stdin read 0x%2.2X\n", (unsigned int) buf[0]);
+		}
+
+		fflush(stdout);
+	}
+
+	gpio_fd_close(gpio_fd);
+	return 0;
+}
+
+
+
+

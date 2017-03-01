@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+
+
+MAILEE="kent.b.larsen@gmail.com"
+HOSTNAME=`hostname`
+MSG="$HOSTNAME cron alert."
+
+(
+   echo "Subject: $MSG"
+   printf "\n\n"
+   echo `date`
+) | msmtp -a default $MAILEE
+exit 0

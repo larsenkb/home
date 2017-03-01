@@ -1,0 +1,15 @@
+[main]
+reports_window_visible = True
+blocks_window_visible = True
+auto_hide_port_labels = True
+scroll_lock = True
+snap_to_grid = True
+show_block_comments = True
+file_open = 
+main_window_width = 2556
+main_window_height = 1385
+reports_window_position = 1056
+blocks_window_position = 2186
+
+[files_open]
+

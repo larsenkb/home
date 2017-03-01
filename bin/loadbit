@@ -1,0 +1,254 @@
+#!/bin/bash
+# 
+#----------------------------------------------------------------------------#
+# Copyright (C) 2014, by the California Institute of Technology. ALL RIGHTS
+# RESERVED. United States Government Sponsorship acknowledged. Any commercial
+# use must be negotiated with the Office of Technology Transfer at the
+# California Institute of Technology.
+#
+# This software may be subject to U.S. export control laws. By accepting this
+# software, the user agrees to comply with all applicable U.S. export laws and
+# regulations. User has the responsibility to obtain export licenses, or other
+# export authority as may be required before exporting such information to
+# foreign countries or providing access to foreign persons.
+#----------------------------------------------------------------------------#
+#
+# Programs a Xilinx FPGA using iMPACT
+#
+# Dependencies:
+#   Xilinx ISE 13.2 or later
+#   Digilent Adept Utilities
+# 
+# Typical Usage:
+# loadbit -p Hs1Jtag -i 1 path/to/bitfile.bit
+
+VERSION=1.0
+DADUTIL='/usr/bin/dadutil'
+BATCHFILE="$(basename $0).$$.batch"
+
+usage()
+{
+cat << EOF
+usage: $0 options bitfile
+
+Programs a Xilinx FPGA using iMPACT.
+
+OPTIONS:
+    -b  Select an FPGA board to infer the correct FPGA index in the JTAG chain (lrpem, lprfm, vc707, kc705, ml605, sp605, ml507, avnet)
+    -d  Use Digilent JTAG programmer
+    -h  Show this message
+    -i  Manually choose an FPGA index in the JTAG chain
+    -l  List all programmer options
+    -s  Serial number of programming device, this may be combined with -d or -x
+    -u  User name, may be combined with -d, but -s will take precedent
+    -v  Print version number
+    -x  Use Xilinx Platform cable programmer
+EOF
+}
+
+BOARD=
+USEINDEX=0
+INDEX=
+USEDIGILENT=0
+DIGILENTNAME=
+LISTDEVICES=0
+USEXILINX=0
+XILINXPORT=auto
+SERIAL=
+while getopts "b:dhi:ls:u:vx:" OPTION
+do
+    case $OPTION in
+        b)
+            BOARD=$OPTARG
+            case $BOARD in
+                lrpem)
+                    INDEX=1
+                    ;;
+                lrpfm)
+                    INDEX=1
+                    ;;
+                vc707)
+                    INDEX=1
+                    ;;
+                kc705)
+                    INDEX=1
+                    ;;
+                ml605)
+                    INDEX=2
+                    ;;
+                sp605)
+                    INDEX=2
+                    ;;
+                ml507)
+                    INDEX=5
+                    ;;
+                avnet)
+                    INDEX=1
+                    ;;
+                default)
+                    INDEX=1
+                    ;;
+            esac
+            ;;
+        d)
+            USEDIGILENT=1
+            ;;
+        h)
+            usage
+            exit 1
+            ;;
+        i)
+            USEINDEX=1
+            INDEX=$OPTARG
+            ;;
+        l)
+            LISTDEVICES=1
+            ;;
+        s)
+            SERIAL=$OPTARG
+            ;;
+        u)
+            DIGILENTNAME=$OPTARG
+            ;;
+        v)
+            echo loadbit version $VERSION
+            exit 0
+            ;;
+        x)
+            USEXILINX=1
+            XILINXPORT=$OPTARG
+            ;;
+        ?)
+            usage
+            exit
+            ;;
+    esac
+done
+
+# Check that the mutually exclusive options were not both specified
+if [[ ! -z $BOARD ]] && [[ $USEINDEX -eq 1 ]] 
+then
+    echo "ERROR: You must use either -b or -i, but not both." 1>&2
+    usage
+    exit 1
+fi
+
+# Check that the mutually exclusive options were not both specified
+if [[ $USEDIGILENT -eq 1 ]] && [[ $USEXILINX -eq 1 ]] 
+then
+    echo "ERROR: You must use either -d or -x, but not both." 1>&2
+    usage
+    exit 1
+fi
+
+# Check to make sure that enough information has been provided to run digilent programmer
+if [[ $USEDIGILENT -eq 1 ]] && [[ -z $DIGILENTNAME ]] && [[ -z $SERIAL ]]
+then
+    echo "ERROR: When using -d, you must also use either -u or -s" 1>&2
+    usage
+    exit 1
+fi
+
+# Check to see if the Digilent executables exist and are executable
+if [[ $USEDIGILENT -eq 1 ]] && [[ ! -x $DADUTIL ]]
+then
+    echo "ERROR: Digilent Adept Utilities must be installed and in \$PATH" 1>&2
+fi
+
+# Check to see if the Xilinx executables exist and are executable
+if [[ $USEXILINX -eq 1 ]] && [[ -z $XILINX  ]]
+then
+    echo "ERROR: \$XILINX environment variable must be defined and point to a valid Xilinx ISE installation" 1>&2
+fi
+
+
+# Positional arguments after the options
+BITFILE=${@:$OPTIND:1}
+
+# List programmer options and exit
+if [[ $LISTDEVICES -eq 1 ]]
+then
+    if [[ -z $XILINX ]]
+    then
+        echo "-----------------------"
+        echo "Listing Xilinx Cables"
+        echo "-----------------------"
+        echo -e "listusbcables" > $BATCHFILE
+        echo -e "exit" >> $BATCHFILE
+        impact -batch $BATCHFILE
+        rm $BATCHFILE
+    else
+        echo "WARNING: \$XILINX environment variable must be defined and point to a valid Xilinx ISE installation. Not listing Xilinx programmers."
+    fi
+
+    if [[ -x $DADUTIL ]]
+    then
+        echo "-----------------------"
+        echo "Listing Digilent Cables"
+        echo "-----------------------"
+        $DADUTIL enum
+    fi
+
+    exit 0
+fi
+
+# Check that the bitfile exists
+if [ ! -e $BITFILE ]
+then
+    echo "ERROR: Bitfile not found" 1>&2
+    exit 1
+fi
+
+# Check for missing index
+if [[ -z $INDEX ]]
+then
+    echo "ERROR: FPGA index not specified. Please use -b or -i." 1>&2
+    usage
+    exit 1
+fi
+
+# Construct the iMPACT script
+echo -e "setMode -bscan" > $BATCHFILE
+
+if [[ $USEXILINX -eq 1 ]]
+then
+    if [[ -z $SERIAL ]]
+    then
+        echo -e "setCable -port $XILINXPORT -baud 3000000" >> $BATCHFILE
+    else
+        echo -e "setCable -port $XILINXPORT -esn $SERIAL -baud 3000000" >> $BATCHFILE
+    fi
+elif [[ $USEDIGILENT -eq 1 ]]
+then
+    if [[ -z $SERIAL ]] && ($DADUTIL enum | grep -q "$DIGILENTNAME")
+    then
+        SERIAL=$($DADUTIL showinfo -d $DIGILENTNAME | grep -E "Serial Number" | sed 's/Serial Number: *//g')
+        echo -e "setCable -target \"digilent_plugin DEVICE=SN:$SERIAL FREQUENCY=10000000\"" >> $BATCHFILE
+    elif [[ ! -z $SERIAL ]]
+    then
+        echo -e "setCable -target \"digilent_plugin DEVICE=SN:$SERIAL FREQUENCY=10000000\"" >> $BATCHFILE
+    else
+        echo "ERROR: No device found by that name" 1>&2
+        echo "Choose a programming device from the following list of Digilent programmers"
+        $DADUTIL enum 1>&2
+        rm $BATCHFILE
+        exit 1
+    fi
+else
+    echo -e "setCable -port auto" >> $BATCHFILE
+fi
+
+echo -e "identify" >> $BATCHFILE
+echo -e "assignFile -p $INDEX -file $BITFILE" >> $BATCHFILE
+echo -e "program -p $INDEX" >> $BATCHFILE
+echo -e "readUsercode -p $INDEX" >> $BATCHFILE
+echo -e "closeCable" >> $BATCHFILE
+echo -e "exit" >> $BATCHFILE
+
+# Run iMPACT with the batch script
+impact -batch $BATCHFILE
+
+# Clean up batch file
+rm $BATCHFILE
+
+exit 0

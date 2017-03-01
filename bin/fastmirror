@@ -1,0 +1,5 @@
+#!/bin/bash
+sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d.mirrorlist.tmp
+sudo sed -i 's/^#Server/Server/' /etc/pacman.d/mirrorlist.tmp
+sudo rankmirrors /etc/pacman.d/mirrorlist.tmp -n 3
+

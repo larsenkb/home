@@ -1,0 +1,22 @@
+CIC filter for Xilinx:
+http://www.ux.uis.no/~karlsk/ELE610/dok/XilinxCICfilter.pdf
+
+CIC in matlab:
+http://www.dsplog.com/2007/07/01/example-of-cascaded-integrator-comb-filter-in-matlab/
+
+Fixed point 8.8 functions in GCC/AVR for DSB:
+CIC and other filters implemented:
+https://courses.cit.cornell.edu/ee476/Math/avrDSP.htm
+
+
+MEMs Microphons, PDM, PDM decoding, etc:
+http://curiouser.cheshireeng.com/2014/10/21/introduction-to-mems-microphones/
+http://curiouser.cheshireeng.com/2014/11/04/using-a-pdm-microphone/
+http://curiouser.cheshireeng.com/2015/01/16/pdm-in-a-tiny-cpu/
+
+
+sending mail from RPi
+http://curiouser.cheshireeng.com/2015/05/08/sending-mail-from-the-splear-with-a-raspberry-pi/
+
+Good discussion on Sigma Delta conversion:
+http://www.beis.de/Elektronik/DeltaSigma/SigmaDelta.html

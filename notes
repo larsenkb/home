@@ -1,0 +1,459 @@
+####  Find in Files
+$ shopt -s globstar        // execute one time per shell
+$ grep "srch str or regex" **/*.[ch]
+    -i  insensitive search
+    -w  search for words
+    -n  show line nbr
+
+
+$ find . -type f -exec grep [-H or -l] 'text-to-find' {} \;
+$ find . -name '*.[ch]' -exec grep 'text-to-find or regex' {} \;
+
+$ grep --include=\*.{c,h} -Rnw . -e "text-to-find or regex"
+
+
+# aliases in bash are static. One cannot pass parameters
+# here is how to do it using alias and function:
+alias foo='_foo() { echo "First: $1"; echo "Second: $2"; }; _foo '
+
+# TOP command
+'q'     - quits (C-c)
+u       - only shows 'user' rows; $ top -u larsenkb
+S-o     - sort by field
+z       - highlight running process
+c       - show absolute path of processes
+d       - change delay or set 'screen refresh interval'
+k       - kill a process
+S-p     - sort CPU utilization
+r       - change the priority of a process (renice)
+S-w     - save the running top command results under /root/.toprc
+h       - display help screen
+$ top -n 10   - run top for 10 cycles then exit
+
+# i3
+i3 User's Guide:  https://i3wm.org/docs/userguide.html
+pf = prefix = $mod = Alt key
+
+A-Enter     open a new terminal; will fill the whole space available
+A-j         move to window to the left (can use left arrow key)
+A-k         move to window to the down (can use down arrow key)
+A-l         move to window to the up (can use up arrow key)
+A-;         move to window to the right (can use right arrow key)
+A-v         split a window vertically before you create a new window
+A-h         split a window horizontally before you create a new window
+Container Layout
+A-e splith/splitv   each window gets a portion of what is left (A-e toggles)
+A-s stacking        Only focused window in the container is displayed. You get a list of windows at the top of the container.
+A-w tabbed          The same principle as stacking, but the list of windows at the top is only a single line which is vertically split.
+A-f         Enter/Exit full screen mode for a window
+A-d         Open Apps with dmenu
+A-S-q       close a window
+A-num       Switch/create 'num' workspace
+A-S-num     Move a window to 'num' workspace
+A-S-r       Restart i3 in place. Gets a clean slate.
+A-S-e       Exit i3.
+A-S-space   Floating window mode (toggles).
+A-u         Focus parent.
+
+# VIM Buffers
+:buffers - lists (listed) buffers
+:ls - alias for above
+ buffer indicators:
+  % - buffer in the current window
+  # - alternate buffer, which can be accessed by CTRL-6
+  a - active buffer, loaded and visible
+  h - hidden buffer, loaded but not visible
+  - - a buffer that cannot be modified, 'modifiable' off
+  = - a buffer that is readonly
+  + - a buffer that has been successfully modified
+  x - a buffer with read errors
+    - if there is no buffer indicator, it signifies a buffer that has not been loaded yet
+
+:files - alias for above
+#append ! to get unlisted buffers as well
+:buffers! or :ls! or :files!
+:edit #4    switch to buffer 4 and edit
+:argadd <file>    add <file> to buffer list
+:badd <file>      add <file> to buffer list
+:b buffer         move to buffer, don't need to type full buffer/file name
+:bN               switch to buffer N
+:e <file>         add <file> to buffer list and edit
+
+# VIM Tab pages
+# starting up:
+vim -p <file1> <file2> ...         each file opened in its own tab page
+:tabe <file>                       open file in new tab
+:tabn[ext]                         go to next tab
+:tabp[revious]                     go to previous tab
+:tabs                              list tabs
+:tabc[lose]                        close a tab
+
+# vimdiff
+do      get changes from other window into current window
+dp      put changes from current window into other window
+]c      jump to next change
+[c      jump to previous change
+C-w C-w switch to other split window
+:diffupdate
+:syntax off
+zo      open folded text
+zc      close folded text
+
+# VIM searching tips and tricks
+For basic searching:
+    /pattern        - search forward for pattern
+    ?pattern        - search backward
+    n               - repeat forward search
+    N               - repeat backward
+Some variables you might want to set:
+    :set ignorecase - case insensitive
+    :set smartcase  - use case if any caps used
+    :set incsearch  - show match as search proceeds
+    :set hlsearch   - search highlighting (:nohl)
+More cool searching tricks:
+    *               - search for word currently under cursor
+    g*              - search for pattial word under cursor (repeat with n)
+    C-o, C-i        - go through jump locations
+    [I              - show lines with matching word under cursor
+
+# VIM markers tips and tricks
+Use markers to set places you want to quickly get back to, or to specify a block of text you want to copy or cut.
+    mk              - mark current position (can use a-z)[mark is in front of cursor]
+    'k              - move to beginning of line containing mark k
+    `k              - more to mark k
+    d`k             - delete from current position to mark k
+    d'k             - delete from current line to line containing mark k
+    ma-z            - marks in same file, can reuse in other open files (buffers) too
+    mA-Z            - marks in different files, filename is part of mark, only one letter
+    y'a             - yank full lines (that the cursor is on to and including line that mark 'a' is on
+    y`a             - yank from mark 'a' to left of current cursor
+
+# VIM text selection
+If you want to do the same thing to a collection of lines, like cut, copy, sor, or format,
+you first need to select the text. Get out of insert mode, hit one of the options below,
+and then move up or down a few lines. you should see the selected text highlighted.
+    V               - selects entire lines
+    v               - selects range of text
+    C-v             - selects columns
+    gv              - reselect block
+After selecting the text, try 'd' to delete, or 'y' to copy, or :s/match/replace/,
+or :center, or !sort, or ...
+
+# VIM indenting tips
+Some variables you might want to set:
+:set tabstop 8      - tabs are at proper location
+:set expandtab      - don't use actual tab character (ctrl-v)
+:set shiftwidth=4   - indenting is 4 spaces
+:set autoindent     - turns it on
+:set smartindent    - does the right thing (mostly) in programs
+:set cindent        - stricter rules for C programs
+I like having auto on, but smart does funny things based on keywords.
+To indent the current line, or a visual block:
+    C-t, C-d        - indent current line forward, backwards (insert mode)
+    > or <          - indent block by sw (repeat with .) (visual mode)
+To stop indenting when pasting with mouse, add this to your .vimrc:
+:set pasttoggle=<f5>
+then try hitting F5 key while in insert mode (or just :set paste).
+
+# VIM folding tips
+Use folds to collapse selected blocks, Useful if you've finished a subroutine and
+want to save window space, or maybe want to fold all blocks of comments.
+    :set foldmethod=manual
+    v%zf            - put cursor on brace then type command
+    va}zf           - create a fold of block where cursor is
+    :set foldmethod=syntax
+    select block, then :fold
+    zo - open
+    zc - close
+    za - toggles the current fold
+    zr - reduces folding by opening one more level of folds throughout buffer
+    zR - open all folds
+    zm - closes one more level of folding
+    zM - closes all levels of folding
+See :help foldmethod for options, use use "mkview and "loadview to save and restore the current window.
+
+# VIM multiple windows tips
+If you want, you can probably do everything from one vim session! :) Here are some commands to
+turn one vim session (inside one xterm) into multiple windows
+    :e filename         - edit another file
+    :split filename     - split window and load another file
+    C-w up arrow        - move cursor up a window
+    C-w C-w             - move cursor to another window (cycle)
+    C-w_                - maximize current window
+    C-w=                - make all equal size
+    10 C-w+             - increase window syze by 10 lines
+    :vsplit file        - vertical split
+    :sview file         - same as split, but readonly
+    :hide               - close current window
+    :only               - keep only this window open
+    :ls                 - show current buffers
+    :bn                 - open buffer #2 in this window
+
+# VIM edit in a stream
+You can take the output of any command and send it into a vim session. From there you could
+format it, change stuff, and then save it to a file.
+    find . | vim -
+
+# VIM tags
+Using tags makes it easier to jump to certain parts of your programs. First run 'ctags' from
+the command line on your source files to generate a 'tags' file, then:
+    :tag TAB            - list the know tags
+    :tag function-name  - jump to that function
+    C-]                 - calls :tag on the word under the cursor
+    C-t                 - returns to spot where you called :tag
+    :ptag               - open tag in preview window (also C-w })
+    :pclose             - close preview window
+
+# VIM registers
+When you copy and cut stuff, it gets saved to registers. You can pull stuff
+from those registers at a later time.
+    :reg                - shows named registers and what's in them
+    "5p                 - paste what's in register "5
+You can also record a whole series of edits to a register, and then apply them over and over.
+    qk                  - records edits into register k
+                            (q again to stop recording)
+    @k                  - execute recorded edits (macro)
+    @@                  - repeat last one
+    5@@                 - repeat 5 times
+    "kp                 - print macro k
+                            (e.g., to edit or add to .vimrc)
+    "kd                 - replace register k with what cursor is on
+
+# VIM variables
+Here is how to show, set, and reset vim's variables:
+    :set                - shows vars different from defaults
+    :set all            - shows all values
+    :set foo?           - shows the value of foo
+    :set foo+=opt       - add opt to the value w/o changing others
+    :set foo-=opt       - remove opt from value
+    :set foo&           - reset foo to default value
+    :setlocal foo       - only the current buffer
+    :verbose set foo?   - tells you where it was last set!
+
+# VIM modelines
+modelines allow you to set variables specific to a file. B default, the first and last
+five lines are read by vim for variable settings. for example, if you put the following
+in the last line of a C program, you would get a texwidth of 60 chars when editing
+that file:
+    /* vim: tw=60 ts=2: */
+
+The modelines variable sets the number of lines (at the beginning and end of each file)
+that vim checks for initializations.
+
+# VIM word & line completion
+Typeing is a pain!. In insert mode, try:
+    C-n, C-p            - next/previous word completion (similar word in current file)
+    C-x C-l (C-n/p)     - line completion
+    :set dictionary=/usr/share/dict/words
+    C-x C-k             - dictionary completion
+also
+    C-w                 - erases word (insert mode ...
+    C-u                 - erases line  ...or on command line)
+
+# VIM open file under cursor
+gf                      - open in the same window ("goto file")
+                          return to a previous buffer using C-^ or C-o
+(C-w)f                  - open in a new window (Ctrl-w f)
+(C-w)gf                 - open in a new tab (Ctrl-w gf)
+:set path+=<path>       - adds to search path so 'gf' will be able to find files
+:checkpath
+:set path-=<path>       - remove a directory from searching
+
+# VIM help
+:help gf
+:help v_gv
+:help CTRL-W_F
+:help CTRL-W_gf
+:help CTRL-^
+:help CTRL-o
+:help path
+:help isfname
+
+# Hg Mercurial
+How to start up a multiple repository web server (look in hgweb.config file)
+$ hg serve --address 127.0.0.1 --port 8000 --webdir-conf /home/larsenkb/repos/hgweb.config --encoding utf8 &
+Then to use it:
+$ hg clone http://127.0.0.1:8000/scramnet scramnet_wa
+
+# tar
+To exclude version control directories (.svn or .hg)
+$ tar cf scramnet.tar scramnet/ --exclude-vcs
+or
+$ tar cf scramnet.tar scramnet/ --exclude scramnet/.hg
+
+# git documentation
+get documentation for ... eg 'git log --graph'
+$ man git-<verb>
+or
+$ git help <verb>
+$ git <verb> --help
+
+# git - the word 'index' means the same as 'staging area'
+#
+# git configuration
+$ git config --list                  # list all the git settings
+$ git config --global user.name "Kent B. Larsen"
+$ git config --global user.email kent.b.larsen@gmail.com
+$ git config --global core.editor vim
+$ git config --global alias st status
+$ git config --global alias co checkout
+$ git config --global alias br branch
+$ git config --global alias up rebase
+$ git config --global alias ci commit
+$ git config --global core.autocrlf input
+$ git config --global core.safecrlf true
+
+# git importing a project / put a project under git
+$ cd project
+$ git init
+$ git add .              # NOTE the 'period'
+$ git status -s          # -s gives short output
+$ git commit
+
+# git transform the current directory into a repo
+$ git init
+
+# git create a new repo (empty) in <dir>
+$ git init <dir>
+
+# git create / init a new repo AND omit the "working directory"
+$ git init --base <dir>
+    central repos should always be 'bare'
+    'bare' central repos usually end in '.git'
+eg
+$ ssh <user>@<host>
+$ cd path/above/repo
+$ git init --bare my-project.git
+
+# git clone a working repo from another or central repo
+$ git clone <repo>
+or
+$ git clone <repo> <new-dir-name>
+eg
+$ git clone ssh://john@example.com/path/to/my-project.git
+
+# git ready to commit? see what is about to be committed
+$ git diff --cached
+   without --cached, will see all differences made but not yet added to 'index' (staged)
+           --staged, is synonym with --cached
+
+# git to see changes/differences to modified files that haven't been staged, yet
+$ git diff
+
+
+$ git status
+
+# git reviewing repo/project history
+$ git log
+$ git log -p                          to see complete diffs
+$ git log --stat --summary            to see overview of changes
+$ git log --oneline
+$ git log --oneline <file>
+
+# git branching
+$ git branch experi
+$ git branch                          lists branches
+$ git checkout experi
+edit files in <experi> branch
+$ git commit -a
+$ git checkout master
+edit files in <master> branch
+$ git commit -a
+$ git merge experi                   merge experi branch back into master
+if conflicts
+$ git diff
+edit conflicts
+$ git commit -a                     commit results of merge
+$ gitk                              show a nice graphical result of the merge
+now delete the experi branch
+$ git branch -d experi
+
+# git unstage a file
+$ git rm --cached <file>
+or
+$ git reset HEAD <file>            remove a file from the index so it won't participate in the next commit.
+
+# git undo uncommitted changes
+$ git reset --hard                 this changes all tracked files to match the most recent committed
+                                   without --hard, will simply unstage file leaving contests as is
+                                   with --hard, removes from stage & removes chnges in files
+$ git clean -f                     remove all untracked files
+                                   git reset and git status are for staging
+                                   git revert and git log are for commits
+
+# git tag the most recent commit
+$ git tag -a v1.0 -m "comment"     -a creates an annotated tag (record name, date and description)
+$ git tag                          view a list of existing tags
+
+# git remove most recent commit
+$ git revert <commit-id>           it is not deleted.
+
+# git view (or go back to) a previous commit snapshot
+$ git checkout <commit-id>
+
+# git remove a file from the working directory (if applicable) and stop tracking the file
+$ git rm <file>
+
+# bitbucket - pushing a local repository to bitbucket for the first time
+# 1st - create the empty repo on bitbucket, then from granpa:
+$ cd ~/projs/lofi
+$ git remote add origin git@bitbucket.org:larsenkb/lofi.git
+$ git push -u origin --all   # pushes up the repo and its refs for the 1st time
+$ git push -u origin --tags  # pushes up any tags
+
+# pacman mirrorlist - using fastest mirrors
+$ sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.tmp
+$ sudo sed -i 's/^#Server/Server/' /etc/pacman.d/mirrorlist.tmp
+$ sudo rankmirrors /etc/pacman.d/mirrorlist.tmp -n 3
+$ sudo vim /etc/pacman.d/mirrorlist            and uncomment the three servers listed above...
+
+### screen
+config file: /etc/screenrc
+config file: ~/.screenrc
+normal prefix (esc character) is Ctrl-a
+$ screen -ls - lists active detached screen sessions
+$ screen -r or -dr - reattach to a screen session (deatach then reattach)
+$ screen <cmd> - when screen already running; created new window and runs <cmd>
+$ screen -L    - turn on automatic logging
+$ screen -S <sessionname> - set new session to <sessionname>
+^a    - normal esc character
+^a ?  - help page
+^a n or ^e or ^a or sp - goto next screen
+^a p or ^p or ^? - goto previous screen
+^a l or ^l - redisplay
+^a d or ^d - detach from screen leaving it running in background
+^a H  - log your session
+^a h  - hardcopy of current display (screenshot)
+^a m  - monitor for activity (toggles)
+^a _  - monitor inactivity
+^a "  - goto screen being monitored
+^a ^a - switch between two windows (like ^a n)
+^a "  - lists all screens
+^a w  - small non-interactive list of screens
+^a A  - label/title screen window
+^a k  - kill misbehaving screen window
+^a '  - prompt for a window name or nbr to switch to
+^a C  - clear screen
+^a F  - resize window to current region size
+^a N  - show current screen nbr (and title)
+^a S  - split screen in half
+^a \t - move to other half
+^a "  - select bottom half screen
+^a Q  - uit split screen. (switch to screen to remain b4 doing it)
+^a :  - online edit of .screenrc
+^a 0..9,- - select window 0..9 or blank window(-)
+^a i or ^i - show info about current window
+
+# PDF viewers
+zathura
+MuPDF
+evince
+okular
+
+# Image viewers
+feh
+
+# restart UDEV
+$ sudo udevadm control --reload
+
+

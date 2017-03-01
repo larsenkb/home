@@ -1,0 +1,82 @@
+! General
+urxvt*termName:  rxvt-256color
+urxvt*loginShell:         true
+urxvt*scrollBar:         false
+urxvt*secondaryScroll:    true
+urxvt*saveLines:         65535
+urxvt*cursorBlink:       true
+urxvt*urgentOnBell:       true
+urxvt*scrollTtyOutput:      false
+urxvt*scrollWithBuffer:     true
+urxvt*scrollTtyKeypress:    true
+!urxvt*override-redirect:false
+!urxvt*borderLess:       false
+!urxvt*internalBorder:       0
+!urxvt*externalBorder:       0
+
+! Extensions
+urxvt*perl-lib:        /usr/lib/urxvt/perl/
+urxvt*perl-ext-common: default,matcher,searchable-scrollback
+!urxvt*urlLauncher:     /usr/bin/chromium
+!urxvt*matcher.button:  1
+!  - catch ugly URLs
+!urxvt.cutchars:        "()'*<>[]{|}"
+
+! Appearance
+!  - use a bitmap font
+#urxvt*font:        -xos4-terminus-medium-*-*-*-12-*-*-*-*-*-*-*
+#urxvt*boldFont:    -xos4-terminus-bold-*-*-*-12-*-*-*-*-*-*-*
+!  - use xft for drawing fonts
+urxvt*font:       xft:DejaVu Sans Mono:size=10
+urxvt*boldFont:       xft:DejaVu Sans Mono:bold:size=10
+!  - cursor
+urxvt*cursorColor: #DCDCCC
+!  - pseudo transparency
+!urxvt*shading:    50
+!urxvt*transparent:true
+!
+!  - color scheme
+urxvt.background:  #000000
+urxvt.foreground:  #EBEBFF
+! black + red
+!urxvt*color0:     #3f3f3f
+urxvt*color0:      #2e3436
+urxvt*color1:      #cc2020
+! green + yellow
+urxvt*color2:      #4e9a06
+urxvt*color3:      #c4a000
+! blue + purple
+urxvt*color4:      #3465a4
+urxvt*color5:      #75507b
+! cyan + white
+urxvt*color6:      #06989a
+urxvt*color7:      #d3d7cf
+! bright-black + bright-red
+urxvt*color8:      #555753
+urxvt*color9:      #ef2929
+! bright-green + bright-yellow
+urxvt*color10:     #8ae234
+urxvt*color11:     #fce94f
+! bright-blue + bright-purple
+urxvt*color12:     #729fcf
+urxvt*color13:     #ad7fa8
+! bright-cyan + bright-white
+urxvt*color14:     #34e2e2
+urxvt*color15:     #eeeeec
+
+urxvt.transparent:  true
+urxvt.shading:      20
+
+! fix italics in tmux
+urxvt*colorIT:      #ff0000
+
+! disable iso14755 mode
+URxvt.iso14755: false
+URxvt.iso14755_52: false
+
+!###########################
+!# X11 stuff
+!###########################
+Xcursor.theme: gnome
+Xcursor.size: 16
+

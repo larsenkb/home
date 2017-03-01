@@ -1,0 +1,6 @@
+[ui]
+# Name data to appear in commits
+username = Kent <kent.b.larsen@gmail.com>
+ssh = ssh -C
+[paths]
+default = ssh://hg@bitbucket.org/larsenkb/avr_am
